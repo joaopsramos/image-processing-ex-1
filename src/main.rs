@@ -1,19 +1,13 @@
+mod circle_area;
 mod triangle;
 
+use circle_area::CircleArea;
 use macroquad::prelude::*;
 use triangle::Triangle;
 
 #[macroquad::main("BasicShapes")]
 async fn main() {
-    let size = 25.0;
-    let x = screen_width() / 2.0;
-    let y = screen_height() / 2.0;
-
-    let v1 = vec2(x, y + 50.0);
-    let v2 = vec2(x - size, y - size);
-    let v3 = vec2(x + size, y - size);
-
-    let mut triangle = Triangle::new(v1, v2, v3, BLUE);
+    let mut triangle = create_triangle();
 
     loop {
         clear_background(BLACK);
@@ -28,10 +22,19 @@ async fn main() {
 
         handle_inputs(&mut triangle);
 
+        triangle.mov_area.draw();
         triangle.draw();
 
         next_frame().await
     }
+}
+
+fn create_triangle() -> Triangle {
+    let middle_x = screen_width() / 2.0;
+    let middle_y = screen_height() / 2.0;
+    let circle_area = CircleArea::new(vec2(middle_x, middle_y), 200.0);
+
+    Triangle::new(25.0, circle_area, BLUE)
 }
 
 fn handle_inputs(triangle: &mut Triangle) {
@@ -60,16 +63,9 @@ fn handle_inputs(triangle: &mut Triangle) {
     }
 }
 
-trait Object {
-    fn draw(&self);
-    fn rotate(&mut self, degrees: f32);
-    fn translate(&mut self, direction: Direction);
-}
-
-enum Direction {
+pub enum Direction {
     Up,
     Down,
     Left,
     Right,
 }
-
