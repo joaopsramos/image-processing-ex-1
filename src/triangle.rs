@@ -1,9 +1,14 @@
+use std::time::Instant;
+
 use macroquad::{
     prelude::{vec2, Color, Vec2},
     shapes::draw_triangle,
+    time::get_time,
 };
 
-use crate::{circle_area::CircleArea, Direction};
+use crate::{bullet::Bullet, circle_area::CircleArea, Direction};
+
+const BULLET_THROTTLE_DURATION_MS: f64 = 200.0;
 
 pub struct Triangle {
     pub v1: Vec2,
@@ -11,6 +16,8 @@ pub struct Triangle {
     pub v3: Vec2,
     pub mov_area: CircleArea,
     pub color: Color,
+    pub bullets: Vec<Bullet>,
+    pub last_bullet_spawn: Instant,
 }
 
 #[macro_export]
@@ -33,10 +40,12 @@ impl Triangle {
             v3: vec2(x + size, y - size),
             mov_area,
             color,
+            bullets: Vec::new(),
+            last_bullet_spawn: Instant::now(),
         }
     }
 
-    fn get_center(&self) -> Vec2 {
+    fn center(&self) -> Vec2 {
         let Triangle { v1, v2, v3, .. } = self;
 
         let x_center = (v1.x + v2.x + v3.x) / 3.0;
@@ -45,9 +54,9 @@ impl Triangle {
         vec2(x_center, y_center)
     }
 
-    pub fn get_pointing_angle(&self) -> f32 {
+    pub fn pointing_angle(&self) -> f32 {
         let Triangle { v1, .. } = self;
-        let center = self.get_center();
+        let center = self.center();
 
         let dx = v1.x - center.x;
         let dy = v1.y - center.y;
@@ -85,5 +94,22 @@ impl Triangle {
                 Direction::Right => vec2(p.x + pixels, p.y),
             }
         }
+    }
+
+    pub fn spawn_bullet(&mut self) -> Option<Bullet> {
+        if !self.can_spawn_bullet() {
+            return None;
+        }
+
+        self.last_bullet_spawn = Instant::now();
+        let angle = self.pointing_angle();
+
+        Some(Bullet::new(self.v1, vec2(angle.sin(), angle.cos())))
+    }
+
+    fn can_spawn_bullet(&self) -> bool {
+        let elapsed_time = self.last_bullet_spawn.elapsed().as_secs_f64() * 1000.0;
+
+        elapsed_time >= BULLET_THROTTLE_DURATION_MS
     }
 }

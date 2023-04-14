@@ -1,13 +1,24 @@
+mod bullet;
 mod circle_area;
+mod rect;
 mod triangle;
 
+use bullet::Bullet;
 use circle_area::CircleArea;
 use macroquad::prelude::*;
+use rect::Enemy;
 use triangle::Triangle;
 
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let mut triangle = create_triangle();
+    let mut bullets = Vec::new();
+    let mut rect = Enemy::new(
+        vec2(screen_width() / 2.0, screen_height() / 2.0),
+        20.0,
+        20.0,
+        PURPLE,
+    );
 
     loop {
         clear_background(BLACK);
@@ -20,10 +31,30 @@ async fn main() {
             YELLOW,
         );
 
-        handle_inputs(&mut triangle);
+        handle_inputs(&mut triangle, &mut bullets);
 
         triangle.mov_area.draw();
         triangle.draw();
+
+        for b in bullets.iter_mut() {
+            b.tick();
+            b.draw();
+
+            if b.shape.overlaps_rect(&rect.shape) {
+                rect.heatlh -= 1.0;
+            }
+        }
+
+        bullets.retain(|b| {
+            b.shape.x > 0.0
+                && b.shape.x < screen_width()
+                && b.shape.y > 0.0
+                && b.shape.y < screen_height()
+        });
+
+        if rect.heatlh > 0.0 {
+            rect.draw()
+        }
 
         next_frame().await
     }
@@ -37,7 +68,7 @@ fn create_triangle() -> Triangle {
     Triangle::new(25.0, circle_area, BLUE)
 }
 
-fn handle_inputs(triangle: &mut Triangle) {
+fn handle_inputs(triangle: &mut Triangle, bullets: &mut Vec<Bullet>) {
     if is_key_down(KeyCode::E) {
         triangle.rotate(5.0);
     }
@@ -60,6 +91,12 @@ fn handle_inputs(triangle: &mut Triangle) {
 
     if is_key_down(KeyCode::D) {
         triangle.translate(Direction::Right);
+    }
+
+    if is_key_down(KeyCode::Space) {
+        if let Some(new_bullet) = triangle.spawn_bullet() {
+            bullets.push(new_bullet);
+        }
     }
 }
 
