@@ -3,12 +3,11 @@ use std::time::Instant;
 use macroquad::{
     prelude::{vec2, Color, Vec2},
     shapes::draw_triangle,
-    time::get_time,
 };
 
 use crate::{bullet::Bullet, circle_area::CircleArea, Direction};
 
-const BULLET_THROTTLE_DURATION_MS: f64 = 200.0;
+const BULLET_THROTTLE_DURATION_MS: u128 = 100;
 
 pub struct Triangle {
     pub v1: Vec2,
@@ -16,7 +15,6 @@ pub struct Triangle {
     pub v3: Vec2,
     pub mov_area: CircleArea,
     pub color: Color,
-    pub bullets: Vec<Bullet>,
     pub last_bullet_spawn: Instant,
 }
 
@@ -40,7 +38,6 @@ impl Triangle {
             v3: vec2(x + size, y - size),
             mov_area,
             color,
-            bullets: Vec::new(),
             last_bullet_spawn: Instant::now(),
         }
     }
@@ -108,7 +105,7 @@ impl Triangle {
     }
 
     fn can_spawn_bullet(&self) -> bool {
-        let elapsed_time = self.last_bullet_spawn.elapsed().as_secs_f64() * 1000.0;
+        let elapsed_time = self.last_bullet_spawn.elapsed().as_millis();
 
         elapsed_time >= BULLET_THROTTLE_DURATION_MS
     }

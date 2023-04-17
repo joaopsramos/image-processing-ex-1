@@ -9,6 +9,7 @@ const BULLET_SPEED: f32 = 2.2;
 pub struct Bullet {
     pub shape: Circle,
     speed: Vec2,
+    pub hit: bool,
 }
 
 impl Bullet {
@@ -16,6 +17,7 @@ impl Bullet {
         Self {
             shape: Circle::new(pos.x, pos.y, BULLET_RAIUS),
             speed: speed * vec2(BULLET_SPEED, BULLET_SPEED),
+            hit: false,
         }
     }
 
