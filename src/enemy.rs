@@ -43,6 +43,19 @@ impl Enemy {
         self.shape.move_to(new_pos);
     }
 
+    pub fn collide_with_hit_points(&self, hit_points: &[Vec2]) -> bool {
+        for point in hit_points {
+            let distance =
+                f32::sqrt((point.x - self.shape.x).powf(2.0) + (point.y - self.shape.y).powf(2.0));
+
+            if distance <= self.shape.r {
+                return true;
+            }
+        }
+
+        false
+    }
+
     pub fn draw(&self) {
         let color = if self.last_time_hit.is_some() {
             HIT_COLOR

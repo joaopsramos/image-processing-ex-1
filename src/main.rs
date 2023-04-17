@@ -45,8 +45,11 @@ async fn main() {
 
             b.tick();
 
+            let Bullet { v1, v2, v3, v4, .. } = b;
+            let hit_points = [*v1, *v2, *v3, *v4];
+
             for enemy in enemies.iter_mut() {
-                if enemy.shape.overlaps_rect(&b.shape) {
+                if enemy.collide_with_hit_points(&hit_points) {
                     enemy.take_damage();
                     b.hit = true;
                     continue 'outer;
@@ -62,25 +65,20 @@ async fn main() {
                 enemy.draw();
             }
 
-            let hit_points = vec![triangle.v1, triangle.v2, triangle.v3, triangle.center()];
+            let Triangle { v1, v2, v3, .. } = triangle;
+            let hit_points = [v1, v2, v3];
 
-            for point in hit_points {
-                let distance = f32::sqrt(
-                    (point.x - enemy.shape.x).powf(2.0) + (point.y - enemy.shape.y).powf(2.0),
-                );
-
-                if distance <= enemy.shape.r {
-                    exit(0)
-                }
+            if enemy.collide_with_hit_points(&hit_points) {
+                exit(0)
             }
         }
 
         bullets.retain(|b| {
             !b.hit
-                || (b.shape.x > 0.0
-                    && b.shape.x < screen_width()
-                    && b.shape.y > 0.0
-                    && b.shape.y < screen_height())
+                || (b.v1.x > 0.0
+                    && b.v1.x < screen_width()
+                    && b.v1.y > 0.0
+                    && b.v1.y < screen_height())
         });
 
         next_frame().await

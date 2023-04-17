@@ -111,7 +111,7 @@ impl Triangle {
         self.last_bullet_spawn = Instant::now();
         let angle = self.pointing_angle();
 
-        Some(Bullet::new(self.v1, vec2(angle.sin(), angle.cos())))
+        Some(Bullet::new(self.v1, angle))
     }
 
     fn can_spawn_bullet(&self) -> bool {
