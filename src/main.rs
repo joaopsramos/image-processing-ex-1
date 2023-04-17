@@ -1,21 +1,21 @@
 mod bullet;
 mod enemy;
+mod enemy_spawner;
 mod triangle;
 
 use bullet::Bullet;
 use enemy::Enemy;
+use enemy_spawner::Spawner;
 use macroquad::prelude::*;
 use triangle::Triangle;
 
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let mut triangle = create_triangle();
+    let mut spawner = Spawner::new();
+
     let mut bullets = Vec::new();
-    let mut enemy = Enemy::new(
-        vec2(screen_width() / 2.0, screen_height() / 2.0),
-        PURPLE,
-        100.0,
-    );
+    let mut enemies: Vec<Enemy> = Vec::new();
 
     loop {
         clear_background(BLACK);
@@ -33,17 +33,23 @@ async fn main() {
         triangle.tick(mouse_position());
         triangle.draw();
 
-        for b in bullets.iter_mut() {
+        if let Some(new_enemy) = spawner.spawn() {
+            enemies.push(new_enemy);
+        }
+
+        'outter: for b in bullets.iter_mut() {
             if b.hit {
                 continue;
             }
 
             b.tick();
 
-            if b.shape.overlaps(&enemy.shape) {
-                enemy.take_damage();
-                b.hit = true;
-                continue;
+            for enemy in enemies.iter_mut() {
+                if b.shape.overlaps(&enemy.shape) {
+                    enemy.take_damage();
+                    b.hit = true;
+                    continue 'outter;
+                }
             }
 
             b.draw();
@@ -57,9 +63,11 @@ async fn main() {
                     && b.shape.y < screen_height())
         });
 
-        if enemy.heatlh > 0.0 {
-            enemy.tick(&triangle);
-            enemy.draw();
+        for enemy in enemies.iter_mut() {
+            if enemy.heatlh > 0.0 {
+                enemy.tick(&triangle);
+                enemy.draw();
+            }
         }
 
         next_frame().await
