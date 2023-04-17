@@ -52,12 +52,47 @@ impl Triangle {
             RED,
         );
 
-        let diff = vec2(mouse_position.0, mouse_position.1) - self.v1;
-        let angle = diff.y.atan2(diff.x);
+        let center = self.center();
+        let angle = (mouse_position.1 - center.y).atan2(mouse_position.0 - center.x)
+            - (self.v1.y - center.y).atan2(self.v1.x - center.x);
+        self.rotate_to(angle);
+        // self.rotate_to(mouse_position);
+    }
 
-        if angle.abs() > 1.0 {
-            self.rotate(angle);
-        }
+    fn rotate_to(&mut self, angle: f32) {
+        let sin_angle = angle.sin();
+        let cos_angle = angle.cos();
+        // Find the center of the triangle
+        let center = (self.v1 + self.v2 + self.v3) / 3.0;
+
+        // Translate the triangle so that its center is at the origin
+        let v1 = self.v1 - center;
+        let v2 = self.v2 - center;
+        let v3 = self.v3 - center;
+
+        // Rotate the triangle by the specified angle
+        let v1x = v1.x * cos_angle - v1.y * sin_angle;
+        let v1y = v1.x * sin_angle + v1.y * cos_angle;
+
+        let v2x = v2.x * cos_angle - v2.y * sin_angle;
+        let v2y = v2.x * sin_angle + v2.y * cos_angle;
+
+        let v3x = v3.x * cos_angle - v3.y * sin_angle;
+        let v3y = v3.x * sin_angle + v3.y * cos_angle;
+
+        let v1 = Vec2::new(v1x, v1y);
+        let v2 = Vec2::new(v2x, v2y);
+        let v3 = Vec2::new(v3x, v3y);
+
+        // Translate the triangle back to its original position
+        let v1 = v1 + center;
+        let v2 = v2 + center;
+        let v3 = v3 + center;
+
+        // Return the rotated triangle
+        self.v1 = v1;
+        self.v2 = v2;
+        self.v3 = v3;
     }
 
     fn center(&self) -> Vec2 {
