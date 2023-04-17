@@ -75,7 +75,7 @@ async fn main() {
 
         bullets.retain(|b| {
             !b.hit
-                || (b.v1.x > 0.0
+                && (b.v1.x > 0.0
                     && b.v1.x < screen_width()
                     && b.v1.y > 0.0
                     && b.v1.y < screen_height())
