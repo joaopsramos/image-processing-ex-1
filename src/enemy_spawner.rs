@@ -8,7 +8,7 @@ use macroquad::{
     window::{screen_height, screen_width},
 };
 
-const DEFAULT_COOLDOWN: f32 = 1.0;
+const DEFAULT_COOLDOWN: f32 = 5.0;
 
 pub struct Spawner {
     pub cooldown_time: f32,

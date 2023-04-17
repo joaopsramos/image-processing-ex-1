@@ -7,6 +7,7 @@ use bullet::Bullet;
 use enemy::Enemy;
 use enemy_spawner::Spawner;
 use macroquad::prelude::*;
+use std::process::exit;
 use triangle::Triangle;
 
 #[macroquad::main("BasicShapes")]
@@ -55,6 +56,25 @@ async fn main() {
             b.draw();
         }
 
+        for enemy in enemies.iter_mut() {
+            if enemy.heatlh > 0.0 {
+                enemy.tick(&triangle);
+                enemy.draw();
+            }
+
+            let hit_points = vec![triangle.v1, triangle.v2, triangle.v3, triangle.center()];
+
+            for point in hit_points {
+                let distance = f32::sqrt(
+                    (point.x - enemy.shape.x).powf(2.0) + (point.y - enemy.shape.y).powf(2.0),
+                );
+
+                if distance <= enemy.shape.r {
+                    exit(0)
+                }
+            }
+        }
+
         bullets.retain(|b| {
             !b.hit
                 || (b.shape.x > 0.0
@@ -62,13 +82,6 @@ async fn main() {
                     && b.shape.y > 0.0
                     && b.shape.y < screen_height())
         });
-
-        for enemy in enemies.iter_mut() {
-            if enemy.heatlh > 0.0 {
-                enemy.tick(&triangle);
-                enemy.draw();
-            }
-        }
 
         next_frame().await
     }

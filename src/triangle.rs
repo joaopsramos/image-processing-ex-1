@@ -60,7 +60,7 @@ impl Triangle {
         self.rotate(angle);
     }
 
-    fn center(&self) -> Vec2 {
+    pub fn center(&self) -> Vec2 {
         let Triangle { v1, v2, v3, .. } = self;
 
         let x_center = (v1.x + v2.x + v3.x) / 3.0;
