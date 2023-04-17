@@ -1,13 +1,14 @@
 use macroquad::{
-    prelude::{vec2, Circle, Vec2, RED},
-    shapes::draw_circle,
+    prelude::{vec2, Rect, Vec2, RED},
+    shapes::draw_rectangle,
 };
 
-const BULLET_RAIUS: f32 = 4.0;
+const BULLET_WIDTH: f32 = 6.0;
+const BULLET_HEIGHT: f32 = 6.0;
 const BULLET_SPEED: f32 = 4.2;
 
 pub struct Bullet {
-    pub shape: Circle,
+    pub shape: Rect,
     speed: Vec2,
     pub hit: bool,
 }
@@ -15,7 +16,7 @@ pub struct Bullet {
 impl Bullet {
     pub fn new(pos: Vec2, speed: Vec2) -> Self {
         Self {
-            shape: Circle::new(pos.x, pos.y, BULLET_RAIUS),
+            shape: Rect::new(pos.x, pos.y, BULLET_WIDTH, BULLET_HEIGHT),
             speed: speed * vec2(BULLET_SPEED, BULLET_SPEED),
             hit: false,
         }
@@ -27,6 +28,6 @@ impl Bullet {
     }
 
     pub fn draw(&self) {
-        draw_circle(self.shape.x, self.shape.y, self.shape.r, RED)
+        draw_rectangle(self.shape.x, self.shape.y, self.shape.w, self.shape.h, RED)
     }
 }

@@ -37,7 +37,7 @@ async fn main() {
             enemies.push(new_enemy);
         }
 
-        'outter: for b in bullets.iter_mut() {
+        'outer: for b in bullets.iter_mut() {
             if b.hit {
                 continue;
             }
@@ -45,10 +45,10 @@ async fn main() {
             b.tick();
 
             for enemy in enemies.iter_mut() {
-                if b.shape.overlaps(&enemy.shape) {
+                if enemy.shape.overlaps_rect(&b.shape) {
                     enemy.take_damage();
                     b.hit = true;
-                    continue 'outter;
+                    continue 'outer;
                 }
             }
 
