@@ -1,8 +1,8 @@
 use std::time::Instant;
 
 use macroquad::{
-    prelude::{Color, Rect, Vec2, WHITE},
-    shapes::draw_rectangle,
+    prelude::{Circle, Color, Vec2, WHITE},
+    shapes::draw_circle,
 };
 
 use crate::triangle::Triangle;
@@ -13,16 +13,16 @@ const HIT_COLOR: Color = WHITE;
 const HIT_DURATION_MS: u128 = 25;
 
 pub struct Enemy {
-    pub shape: Rect,
+    pub shape: Circle,
     color: Color,
     pub heatlh: f32,
     last_time_hit: Option<Instant>,
 }
 
 impl Enemy {
-    pub fn new(pos: Vec2, width: f32, height: f32, color: Color) -> Self {
+    pub fn new(pos: Vec2, color: Color, r: f32) -> Self {
         Self {
-            shape: Rect::new(pos.x, pos.y, width, height),
+            shape: Circle::new(pos.x, pos.y, r),
             color,
             heatlh: HEALTH,
             last_time_hit: None,
@@ -44,17 +44,13 @@ impl Enemy {
             self.color
         };
 
-        draw_rectangle(
-            self.shape.x,
-            self.shape.y,
-            self.shape.w,
-            self.shape.h,
-            color,
-        )
+        draw_circle(self.shape.x, self.shape.y, self.shape.r, color)
     }
 
     pub fn take_damage(&mut self) {
         self.heatlh -= HEALTH_LOST_PER_HIT;
         self.last_time_hit = Some(Instant::now());
+
+        self.shape.r = self.heatlh;
     }
 }

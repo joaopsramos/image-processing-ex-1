@@ -13,9 +13,8 @@ async fn main() {
     let mut bullets = Vec::new();
     let mut enemy = Enemy::new(
         vec2(screen_width() / 2.0, screen_height() / 2.0),
-        20.0,
-        20.0,
         PURPLE,
+        100.0,
     );
 
     loop {
@@ -41,7 +40,7 @@ async fn main() {
 
             b.tick();
 
-            if b.shape.overlaps_rect(&enemy.shape) {
+            if b.shape.overlaps(&enemy.shape) {
                 enemy.take_damage();
                 b.hit = true;
                 continue;
