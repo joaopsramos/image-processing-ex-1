@@ -34,6 +34,7 @@ async fn main() {
         handle_inputs(&mut triangle, &mut bullets);
 
         triangle.mov_area.draw();
+        triangle.tick(mouse_position());
         triangle.draw();
 
         for b in bullets.iter_mut() {

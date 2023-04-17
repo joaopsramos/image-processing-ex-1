@@ -1,8 +1,8 @@
 use std::time::Instant;
 
 use macroquad::{
-    prelude::{vec2, Color, Vec2},
-    shapes::draw_triangle,
+    prelude::{vec2, Color, Vec2, RED},
+    shapes::{draw_line, draw_triangle},
 };
 
 use crate::{bullet::Bullet, circle_area::CircleArea, Direction};
@@ -42,6 +42,24 @@ impl Triangle {
         }
     }
 
+    pub fn tick(&mut self, mouse_position: (f32, f32)) {
+        draw_line(
+            self.v1.x,
+            self.v1.y,
+            mouse_position.0,
+            mouse_position.1,
+            1.0,
+            RED,
+        );
+
+        let diff = vec2(mouse_position.0, mouse_position.1) - self.v1;
+        let angle = diff.y.atan2(diff.x);
+
+        if angle.abs() > 1.0 {
+            self.rotate(angle);
+        }
+    }
+
     fn center(&self) -> Vec2 {
         let Triangle { v1, v2, v3, .. } = self;
 
@@ -67,7 +85,7 @@ impl Triangle {
 
     pub fn rotate(&mut self, degrees: f32) {
         let angle = degrees.to_radians();
-        let relative_to = self.mov_area.pos;
+        let relative_to = self.center();
 
         for v in vertices_mut!(self, v1, v2, v3) {
             let x = v.x - relative_to.x;
