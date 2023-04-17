@@ -11,7 +11,7 @@ const HEALTH: f32 = 100.0;
 const HEALTH_LOST_PER_HIT: f32 = 10.0;
 const HIT_COLOR: Color = WHITE;
 const HIT_DURATION_MS: u128 = 25;
-const DEFAULT_INTERPOLATION: f32 = 0.002;
+const DEFAULT_INTERPOLATION: f32 = 0.005;
 
 pub struct Enemy {
     pub shape: Circle,
@@ -37,10 +37,8 @@ impl Enemy {
             }
         }
 
-        let start_pos = Vec2::new(self.shape.x, self.shape.y);
         let end_pos = player.center();
-
-        let new_pos = Vec2::lerp(start_pos, end_pos, DEFAULT_INTERPOLATION);
+        let new_pos = Vec2::lerp(self.shape.point(), end_pos, DEFAULT_INTERPOLATION);
 
         self.shape.move_to(new_pos);
     }

@@ -1,8 +1,8 @@
 use std::time::Instant;
 
 use macroquad::{
-    prelude::{vec2, Color, Vec2, RED},
-    shapes::{draw_line, draw_triangle},
+    prelude::{vec2, Color, Vec2},
+    shapes::draw_triangle,
     window::{screen_height, screen_width},
 };
 
@@ -45,15 +45,6 @@ impl Triangle {
     }
 
     pub fn tick(&mut self, mouse_position: (f32, f32)) {
-        draw_line(
-            self.v1.x,
-            self.v1.y,
-            mouse_position.0,
-            mouse_position.1,
-            1.0,
-            RED,
-        );
-
         let center = self.center();
         let angle = (mouse_position.1 - center.y).atan2(mouse_position.0 - center.x)
             - (self.v1.y - center.y).atan2(self.v1.x - center.x);
