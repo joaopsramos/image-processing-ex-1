@@ -3,9 +3,10 @@ use std::time::Instant;
 use macroquad::{
     prelude::{vec2, Color, Vec2, RED},
     shapes::{draw_line, draw_triangle},
+    window::{screen_height, screen_width},
 };
 
-use crate::{bullet::Bullet, circle_area::CircleArea, Direction};
+use crate::{bullet::Bullet, Direction};
 
 const BULLET_THROTTLE_DURATION_MS: u128 = 100;
 
@@ -13,7 +14,6 @@ pub struct Triangle {
     pub v1: Vec2,
     pub v2: Vec2,
     pub v3: Vec2,
-    pub mov_area: CircleArea,
     pub color: Color,
     pub last_bullet_spawn: Instant,
 }
@@ -26,17 +26,19 @@ macro_rules! vertices_mut {
 }
 
 impl Triangle {
-    pub fn new(size: f32, mov_area: CircleArea, color: Color) -> Self {
+    pub fn new(size: f32, color: Color) -> Self {
         let initial_angle = (90.0_f32 + 180.0).to_radians();
 
-        let x = mov_area.pos.x + mov_area.radius * initial_angle.cos();
-        let y = mov_area.pos.y + mov_area.radius * initial_angle.sin();
+        let middle_x = screen_width() / 2.0;
+        let middle_y = screen_height() / 2.0;
+
+        let x = middle_x + 200.0 * initial_angle.cos();
+        let y = middle_y + 200.0 * initial_angle.sin();
 
         Triangle {
             v1: vec2(x, y + size * 2.0),
             v2: vec2(x - size, y - size),
             v3: vec2(x + size, y - size),
-            mov_area,
             color,
             last_bullet_spawn: Instant::now(),
         }
@@ -55,44 +57,7 @@ impl Triangle {
         let center = self.center();
         let angle = (mouse_position.1 - center.y).atan2(mouse_position.0 - center.x)
             - (self.v1.y - center.y).atan2(self.v1.x - center.x);
-        self.rotate_to(angle);
-        // self.rotate_to(mouse_position);
-    }
-
-    fn rotate_to(&mut self, angle: f32) {
-        let sin_angle = angle.sin();
-        let cos_angle = angle.cos();
-        // Find the center of the triangle
-        let center = (self.v1 + self.v2 + self.v3) / 3.0;
-
-        // Translate the triangle so that its center is at the origin
-        let v1 = self.v1 - center;
-        let v2 = self.v2 - center;
-        let v3 = self.v3 - center;
-
-        // Rotate the triangle by the specified angle
-        let v1x = v1.x * cos_angle - v1.y * sin_angle;
-        let v1y = v1.x * sin_angle + v1.y * cos_angle;
-
-        let v2x = v2.x * cos_angle - v2.y * sin_angle;
-        let v2y = v2.x * sin_angle + v2.y * cos_angle;
-
-        let v3x = v3.x * cos_angle - v3.y * sin_angle;
-        let v3y = v3.x * sin_angle + v3.y * cos_angle;
-
-        let v1 = Vec2::new(v1x, v1y);
-        let v2 = Vec2::new(v2x, v2y);
-        let v3 = Vec2::new(v3x, v3y);
-
-        // Translate the triangle back to its original position
-        let v1 = v1 + center;
-        let v2 = v2 + center;
-        let v3 = v3 + center;
-
-        // Return the rotated triangle
-        self.v1 = v1;
-        self.v2 = v2;
-        self.v3 = v3;
+        self.rotate(angle);
     }
 
     fn center(&self) -> Vec2 {
@@ -119,22 +84,23 @@ impl Triangle {
     }
 
     pub fn rotate(&mut self, degrees: f32) {
-        let angle = degrees.to_radians();
         let relative_to = self.center();
+        let cos = degrees.cos();
+        let sin = degrees.sin();
 
         for v in vertices_mut!(self, v1, v2, v3) {
             let x = v.x - relative_to.x;
             let y = v.y - relative_to.y;
 
-            let new_x = angle.cos() * x - angle.sin() * y;
-            let new_y = angle.sin() * x + angle.cos() * y;
+            let new_x = cos * x - sin * y;
+            let new_y = sin * x + cos * y;
 
             *v = vec2(new_x + relative_to.x, new_y + relative_to.y)
         }
     }
 
     pub fn translate(&mut self, direction: Direction) {
-        let pixels = 10.0;
+        let pixels = 1.2;
 
         for p in vertices_mut!(self, v1, v2, v3) {
             *p = match direction {

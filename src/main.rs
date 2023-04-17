@@ -1,10 +1,8 @@
 mod bullet;
-mod circle_area;
 mod enemy;
 mod triangle;
 
 use bullet::Bullet;
-use circle_area::CircleArea;
 use enemy::Enemy;
 use macroquad::prelude::*;
 use triangle::Triangle;
@@ -33,7 +31,6 @@ async fn main() {
 
         handle_inputs(&mut triangle, &mut bullets);
 
-        triangle.mov_area.draw();
         triangle.tick(mouse_position());
         triangle.draw();
 
@@ -71,22 +68,10 @@ async fn main() {
 }
 
 fn create_triangle() -> Triangle {
-    let middle_x = screen_width() / 2.0;
-    let middle_y = screen_height() / 2.0;
-    let circle_area = CircleArea::new(vec2(middle_x, middle_y), 200.0);
-
-    Triangle::new(25.0, circle_area, BLUE)
+    Triangle::new(25.0, BLUE)
 }
 
 fn handle_inputs(triangle: &mut Triangle, bullets: &mut Vec<Bullet>) {
-    if is_key_down(KeyCode::E) {
-        triangle.rotate(5.0);
-    }
-
-    if is_key_down(KeyCode::Q) {
-        triangle.rotate(-5.0);
-    }
-
     if is_key_down(KeyCode::W) {
         triangle.translate(Direction::Up);
     }

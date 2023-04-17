@@ -4,7 +4,7 @@ use macroquad::{
 };
 
 const BULLET_RAIUS: f32 = 4.0;
-const BULLET_SPEED: f32 = 2.2;
+const BULLET_SPEED: f32 = 4.2;
 
 pub struct Bullet {
     pub shape: Circle,
