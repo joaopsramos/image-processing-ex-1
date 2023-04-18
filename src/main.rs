@@ -17,6 +17,8 @@ async fn main() {
 
     let mut bullets = Vec::new();
     let mut enemies: Vec<Enemy> = Vec::new();
+    
+    let mut is_over = false;
 
     loop {
         clear_background(BLACK);
@@ -28,6 +30,19 @@ async fn main() {
             20.0,
             YELLOW,
         );
+
+        if (is_over) {
+            let mut game_over_label = "Game Over";
+            draw_text(
+                game_over_label,
+                (screen_width() - measure_text(game_over_label, None, 100, 1.0).width) / 2.0,
+                (screen_height() - measure_text(game_over_label, None, 100, 1.0).height) / 2.0,
+                100.0,
+                YELLOW,
+            );
+            next_frame().await;
+            continue;
+        }
 
         handle_inputs(&mut triangle, &mut bullets);
 
@@ -69,7 +84,8 @@ async fn main() {
             let hit_points = [v1, v2, v3];
 
             if enemy.collide_with_hit_points(&hit_points) {
-                exit(0)
+                is_over = true;
+                // exit(0)
             }
         }
 
