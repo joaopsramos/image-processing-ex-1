@@ -39,31 +39,7 @@ async fn main() {
         );
 
         if is_over {
-            let game_over_label = "Game Over";
-            let measure = measure_text(game_over_label, None, 100, 1.0);
-            let button_x = (screen_width() - 200.0) / 2.0;
-            let button_y = (screen_height() + 150.0) / 2.0;
-            let button_width = 200.0;
-            let button_height = 50.0;
-
-            draw_text(
-                game_over_label,
-                (screen_width() - measure.width) / 2.0,
-                (screen_height() - measure.height) / 2.0,
-                100.0,
-                YELLOW,
-            );
-            draw_rectangle(button_x, button_y, button_width, button_height, RED);
-            draw_text("Try Again", button_x + 35.0, button_y + 30.0, 32.0, WHITE);
-            if is_mouse_button_down(MouseButton::Left)
-                && is_mouse_button_pressed(MouseButton::Left)
-                && is_mouse_inside_button(button_x, button_y, button_width, button_height)
-            {
-                score = 0;
-                is_over = false;
-                enemies.clear();
-                bullets.clear();
-            }
+            game_over_view(&mut score, &mut is_over, &mut enemies, &mut bullets);
             next_frame().await;
             continue;
         }
@@ -170,6 +146,39 @@ fn is_mouse_inside_button(
         && mouse_x <= button_x + button_width
         && mouse_y >= button_y
         && mouse_y <= button_y + button_height
+}
+
+fn game_over_view(
+    score: &mut i32,
+    is_over: &mut bool,
+    enemies: &mut Vec<Enemy>,
+    bullets: &mut Vec<Bullet>,
+) {
+    let game_over_label = "Game Over";
+    let measure = measure_text(game_over_label, None, 100, 1.0);
+    let button_x = (screen_width() - 200.0) / 2.0;
+    let button_y = (screen_height() + 150.0) / 2.0;
+    let button_width = 200.0;
+    let button_height = 50.0;
+
+    draw_text(
+        game_over_label,
+        (screen_width() - measure.width) / 2.0,
+        (screen_height() - measure.height) / 2.0,
+        100.0,
+        YELLOW,
+    );
+    draw_rectangle(button_x, button_y, button_width, button_height, RED);
+    draw_text("Try Again", button_x + 35.0, button_y + 30.0, 32.0, WHITE);
+    if is_mouse_button_down(MouseButton::Left)
+        && is_mouse_button_pressed(MouseButton::Left)
+        && is_mouse_inside_button(button_x, button_y, button_width, button_height)
+    {
+        *score = 0;
+        *is_over = false;
+        enemies.clear();
+        bullets.clear();
+    }
 }
 
 pub enum Direction {
