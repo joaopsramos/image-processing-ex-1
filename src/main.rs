@@ -16,8 +16,8 @@ async fn main() {
 
     let mut bullets = Vec::new();
     let mut enemies: Vec<Enemy> = Vec::new();
-
     let mut is_over = false;
+    let mut score = 0;
 
     loop {
         clear_background(BLACK);
@@ -30,8 +30,17 @@ async fn main() {
             YELLOW,
         );
 
+        draw_text(
+            format!("score = {}", score).as_str(),
+            screen_width() - 100.0,
+            20.0,
+            20.0,
+            YELLOW,
+        );
+
         if is_over {
             let game_over_label = "Game Over";
+            let measure = measure_text(game_over_label, None, 100, 1.0);
             let button_x = (screen_width() - 200.0) / 2.0;
             let button_y = (screen_height() + 150.0) / 2.0;
             let button_width = 200.0;
@@ -39,26 +48,18 @@ async fn main() {
 
             draw_text(
                 game_over_label,
-                (screen_width() - measure_text(game_over_label, None, 100, 1.0).width) / 2.0,
-                (screen_height() - measure_text(game_over_label, None, 100, 1.0).height) / 2.0,
+                (screen_width() - measure.width) / 2.0,
+                (screen_height() - measure.height) / 2.0,
                 100.0,
                 YELLOW,
             );
-            draw_rectangle(
-                button_x,
-                button_y, 
-                button_width, 
-                button_height, 
-                RED
-            );
-            draw_text(
-                "Try Again", 
-                button_x + 35.0, 
-                button_y + 30.0, 
-                32.0, 
-                WHITE
-            );
-            if is_mouse_button_down(MouseButton::Left)  && is_mouse_button_pressed(MouseButton::Left) && is_mouse_inside_button(button_x, button_y, button_width, button_height) {
+            draw_rectangle(button_x, button_y, button_width, button_height, RED);
+            draw_text("Try Again", button_x + 35.0, button_y + 30.0, 32.0, WHITE);
+            if is_mouse_button_down(MouseButton::Left)
+                && is_mouse_button_pressed(MouseButton::Left)
+                && is_mouse_inside_button(button_x, button_y, button_width, button_height)
+            {
+                score = 0;
                 is_over = false;
                 enemies.clear();
                 bullets.clear();
@@ -88,7 +89,10 @@ async fn main() {
 
             for enemy in enemies.iter_mut() {
                 if enemy.collide_with_hit_points(&hit_points) {
-                    enemy.take_damage();
+                    let died = enemy.take_damage();
+                    if died {
+                        score += 1;
+                    }
                     b.hit = true;
                     continue 'outer;
                 }
@@ -104,7 +108,7 @@ async fn main() {
             }
 
             let Triangle { v1, v2, v3, .. } = triangle;
-            let hit_points = [v1, v2, v3];
+            let hit_points = [v1, v2, v3, triangle.center()];
 
             if enemy.collide_with_hit_points(&hit_points) {
                 is_over = true;
@@ -153,11 +157,19 @@ fn handle_inputs(triangle: &mut Triangle, bullets: &mut Vec<Bullet>) {
 }
 
 // Verifica se o cursor do mouse está dentro do retângulo do botão
-fn is_mouse_inside_button(button_x: f32, button_y: f32, button_width: f32, button_height: f32) -> bool {
+fn is_mouse_inside_button(
+    button_x: f32,
+    button_y: f32,
+    button_width: f32,
+    button_height: f32,
+) -> bool {
     let mouse_position = mouse_position();
     let mouse_x = mouse_position.0;
     let mouse_y = mouse_position.1;
-    mouse_x >= button_x && mouse_x <= button_x + button_width && mouse_y >= button_y && mouse_y <= button_y + button_height
+    mouse_x >= button_x
+        && mouse_x <= button_x + button_width
+        && mouse_y >= button_y
+        && mouse_y <= button_y + button_height
 }
 
 pub enum Direction {

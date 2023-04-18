@@ -66,10 +66,11 @@ impl Enemy {
         draw_circle(self.shape.x, self.shape.y, self.shape.r, color)
     }
 
-    pub fn take_damage(&mut self) {
+    pub fn take_damage(&mut self) -> bool {
         self.heatlh -= HEALTH_LOST_PER_HIT;
         self.last_time_hit = Some(Instant::now());
 
         self.shape.r = self.heatlh;
+        return self.heatlh <= 0.0;
     }
 }
