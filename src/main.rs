@@ -92,7 +92,7 @@ async fn main() {
             }
 
             let Triangle { v1, v2, v3, .. } = triangle;
-            let hit_points = [v1, v2, v3];
+            let hit_points = [v1, v2, v3, triangle.center()];
 
             if enemy.collide_with_hit_points(&hit_points) {
                 is_over = true;
