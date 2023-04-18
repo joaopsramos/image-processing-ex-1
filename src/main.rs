@@ -32,6 +32,11 @@ async fn main() {
 
         if is_over {
             let game_over_label = "Game Over";
+            let button_x = (screen_width() - 200.0) / 2.0;
+            let button_y = (screen_height() + 150.0) / 2.0;
+            let button_width = 200.0;
+            let button_height = 50.0;
+
             draw_text(
                 game_over_label,
                 (screen_width() - measure_text(game_over_label, None, 100, 1.0).width) / 2.0,
@@ -39,6 +44,25 @@ async fn main() {
                 100.0,
                 YELLOW,
             );
+            draw_rectangle(
+                button_x,
+                button_y, 
+                button_width, 
+                button_height, 
+                RED
+            );
+            draw_text(
+                "Try Again", 
+                button_x + 35.0, 
+                button_y + 30.0, 
+                32.0, 
+                WHITE
+            );
+            if is_mouse_button_down(MouseButton::Left)  && is_mouse_button_pressed(MouseButton::Left) && is_mouse_inside_button(button_x, button_y, button_width, button_height) {
+                is_over = false;
+                enemies.clear();
+                bullets.clear();
+            }
             next_frame().await;
             continue;
         }
@@ -126,6 +150,14 @@ fn handle_inputs(triangle: &mut Triangle, bullets: &mut Vec<Bullet>) {
             bullets.push(new_bullet);
         }
     }
+}
+
+// Verifica se o cursor do mouse está dentro do retângulo do botão
+fn is_mouse_inside_button(button_x: f32, button_y: f32, button_width: f32, button_height: f32) -> bool {
+    let mouse_position = mouse_position();
+    let mouse_x = mouse_position.0;
+    let mouse_y = mouse_position.1;
+    mouse_x >= button_x && mouse_x <= button_x + button_width && mouse_y >= button_y && mouse_y <= button_y + button_height
 }
 
 pub enum Direction {
