@@ -7,7 +7,6 @@ use bullet::Bullet;
 use enemy::Enemy;
 use enemy_spawner::Spawner;
 use macroquad::prelude::*;
-use std::process::exit;
 use triangle::Triangle;
 
 #[macroquad::main("BasicShapes")]
@@ -17,7 +16,7 @@ async fn main() {
 
     let mut bullets = Vec::new();
     let mut enemies: Vec<Enemy> = Vec::new();
-    
+
     let mut is_over = false;
 
     loop {
@@ -31,8 +30,8 @@ async fn main() {
             YELLOW,
         );
 
-        if (is_over) {
-            let mut game_over_label = "Game Over";
+        if is_over {
+            let game_over_label = "Game Over";
             draw_text(
                 game_over_label,
                 (screen_width() - measure_text(game_over_label, None, 100, 1.0).width) / 2.0,
