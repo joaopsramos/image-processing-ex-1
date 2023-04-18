@@ -16,8 +16,8 @@ async fn main() {
 
     let mut bullets = Vec::new();
     let mut enemies: Vec<Enemy> = Vec::new();
-
     let mut is_over = false;
+    let mut score = 0;
 
     loop {
         clear_background(BLACK);
@@ -30,12 +30,21 @@ async fn main() {
             YELLOW,
         );
 
+        draw_text(
+            format!("score = {}", score).as_str(),
+            screen_width() - 100.0,
+            20.0,
+            20.0,
+            YELLOW,
+        );
+
         if is_over {
             let game_over_label = "Game Over";
+            let measure = measure_text(game_over_label, None, 100, 1.0);
             draw_text(
                 game_over_label,
-                (screen_width() - measure_text(game_over_label, None, 100, 1.0).width) / 2.0,
-                (screen_height() - measure_text(game_over_label, None, 100, 1.0).height) / 2.0,
+                (screen_width() - measure.width) / 2.0,
+                (screen_height() - measure.height) / 2.0,
                 100.0,
                 YELLOW,
             );
@@ -64,7 +73,10 @@ async fn main() {
 
             for enemy in enemies.iter_mut() {
                 if enemy.collide_with_hit_points(&hit_points) {
-                    enemy.take_damage();
+                    let died = enemy.take_damage();
+                    if died {
+                        score += 1;
+                    }
                     b.hit = true;
                     continue 'outer;
                 }
